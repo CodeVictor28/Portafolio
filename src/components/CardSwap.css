@@ -1,0 +1,30 @@
+.card-swap-container {
+  position: relative;
+  max-width: 100%;
+  perspective: 1100px;
+  overflow: visible;
+  transform-origin: center center;
+}
+
+.card-swap-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: min(100%, 500px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+
+@media (max-width: 620px) {
+  .card-swap-container {
+    perspective: 850px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-swap-card {
+    will-change: auto;
+  }
+}

@@ -1,0 +1,218 @@
+.dock-outer {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-height: calc(var(--dock-panel-height, 68px) + 42px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible;
+}
+
+.dock-panel {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  min-height: var(--dock-panel-height, 68px);
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 18px;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 7%), transparent 55%),
+    rgb(12 12 12 / 90%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 5%),
+    0 18px 50px rgb(0 0 0 / 32%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: translateX(-50%);
+}
+
+.dock-item {
+  --dock-brand-color: 255 255 255;
+
+  position: relative;
+  width: var(--dock-base-size, 50px);
+  height: var(--dock-base-size, 50px);
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 30% 20%, rgb(255 255 255 / 11%), transparent 48%),
+    var(--surface);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 5%),
+    0 8px 20px rgb(0 0 0 / 24%);
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dock-item:is(:hover, :focus-visible) {
+  z-index: 2;
+  border-color: rgb(var(--dock-brand-color) / 72%);
+  color: var(--accent);
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgb(var(--dock-brand-color) / 16%),
+      transparent 62%
+    ),
+    var(--surface);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 10px 26px rgb(var(--dock-brand-color) / 14%);
+}
+
+.dock-item:focus-visible {
+  outline: 3px solid rgb(255 255 255 / 28%);
+  outline-offset: 3px;
+}
+
+.dock-icon {
+  width: 56%;
+  height: 56%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-social-logo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 4px 7px rgb(0 0 0 / 22%))
+    drop-shadow(0 0 9px rgb(var(--dock-brand-color) / 20%));
+}
+
+.dock-item--github {
+  --dock-brand-color: 255 255 255;
+}
+
+.dock-item--linkedin {
+  --dock-brand-color: 10 102 194;
+}
+
+.dock-item--discord {
+  --dock-brand-color: 88 101 242;
+}
+
+.dock-mobile-label {
+  display: none;
+}
+
+.dock-label {
+  position: absolute;
+  bottom: calc(100% + 11px);
+  left: 50%;
+  width: max-content;
+  padding: 5px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--text);
+  background: rgb(13 13 13 / 96%);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 30%);
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1;
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .dock-panel {
+    padding: 9px 10px;
+    gap: 12px;
+    border-radius: 18px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .dock-outer {
+    min-height: 92px;
+  }
+
+  .dock-panel {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: min(100%, 320px);
+    min-height: 72px;
+    padding: 9px 10px;
+    align-items: center;
+    gap: clamp(8px, 4vw, 16px);
+    transform: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .dock-item {
+    overflow: hidden;
+  }
+
+  .dock-item:is(:hover, :focus-visible) {
+    transform: none;
+  }
+
+  .dock-item:active {
+    border-color: var(--accent);
+    background-color: rgb(255 255 255 / 12%);
+    transform: scale(0.92);
+  }
+
+  .dock-icon {
+    width: 46%;
+    height: 46%;
+    transform: translateY(-5px);
+  }
+
+  .dock-mobile-label {
+    position: absolute;
+    right: 2px;
+    bottom: 5px;
+    left: 2px;
+    display: block;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.52rem;
+    font-weight: 750;
+    line-height: 1;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dock-label {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) and (pointer: coarse) {
+  .dock-panel {
+    gap: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-item,
+  .dock-label {
+    transition: none;
+  }
+}

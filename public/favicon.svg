@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title">
+  <title id="title">Portafolio de Víctor</title>
+  <rect width="48" height="48" rx="13" fill="#0b0b0b"/>
+  <path fill="#f2f2ef" d="M10 11h7.2L24 31.1 30.8 11H38L27.5 38h-7L10 11Z"/>
+  <path fill="#777774" d="M35 35h4v4h-4z"/>
+</svg>
