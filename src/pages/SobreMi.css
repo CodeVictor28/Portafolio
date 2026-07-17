@@ -715,6 +715,41 @@
   }
 }
 
+@media (max-width: 380px) {
+  .about-page .about-section.standalone-page {
+    width: min(100% - 20px, 1180px);
+    padding-top: 54px;
+    padding-bottom: max(64px, env(safe-area-inset-bottom));
+  }
+
+  .about-intro__tags span {
+    padding-inline: 9px;
+    font-size: 0.63rem;
+  }
+
+  .education-swap-stage {
+    min-height: 540px;
+  }
+
+  .education-swap-stage .card-swap-container > .education-card {
+    padding-inline: 15px;
+  }
+
+  .capabilities-section {
+    padding-inline: 12px;
+  }
+
+  .about-page .capability-column {
+    padding-inline: 15px;
+  }
+
+  .capabilities-section .line-sidebar {
+    --marker-length: 28px !important;
+    --max-shift: 12px !important;
+    --font-size: 0.84rem !important;
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .education-card:hover,
   .about-page .capability-column:hover {

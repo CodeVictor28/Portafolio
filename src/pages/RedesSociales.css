@@ -1209,6 +1209,49 @@
   }
 }
 
+@media (max-width: 380px) {
+  .networks-page {
+    padding-top: 52px;
+    padding-bottom: max(64px, env(safe-area-inset-bottom));
+  }
+
+  .networks-intro,
+  .networks-carousel-section {
+    width: min(100% - 20px, 1180px);
+  }
+
+  .networks-intro {
+    padding-inline: 15px;
+  }
+
+  .networks-intro h1 {
+    font-size: clamp(2.25rem, 11.8vw, 2.85rem);
+  }
+
+  .networks-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .network-constellation {
+    transform: scale(0.92);
+    transform-origin: center;
+  }
+
+  .social-carousel {
+    min-height: 560px;
+    padding-inline: 8px;
+  }
+
+  .social-carousel-slide {
+    width: min(286px, calc(100% - 34px));
+  }
+
+  .social-card-front,
+  .social-card-back {
+    padding-inline: 19px;
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .social-card-back a:hover,
   .social-carousel-controls > button:hover {

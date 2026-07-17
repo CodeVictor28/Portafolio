@@ -6,7 +6,7 @@ export const perfil = {
   descripcion:
     "Créo interfaces claras, modernas y adaptables que convierten ideas en experiencias digitales con react e IA.",
   ubicacion: "Ecuador",
-  correo: "victor2341ledesma9@gmail.com",
+  correo: "vicgaminghd28oficial@gmail.com",
 };
 
 export const redes = [

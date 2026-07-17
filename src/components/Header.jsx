@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router'
 import GooeyNav from './GooeyNav.jsx'
 
@@ -26,6 +26,26 @@ function Header() {
     setMenuAbierto(false)
   }
 
+  useEffect(() => {
+    setMenuAbierto(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!menuAbierto) return undefined
+
+    function cerrarConEscape(evento) {
+      if (evento.key === 'Escape') setMenuAbierto(false)
+    }
+
+    document.body.classList.add('menu-open')
+    window.addEventListener('keydown', cerrarConEscape)
+
+    return () => {
+      document.body.classList.remove('menu-open')
+      window.removeEventListener('keydown', cerrarConEscape)
+    }
+  }, [menuAbierto])
+
   return (
     <header className={`site-header ${esInicio ? 'site-header--home' : ''}`}>
       <div className="header-inner">
@@ -38,6 +58,7 @@ function Header() {
           type="button"
           aria-controls="menu-principal"
           aria-expanded={menuAbierto}
+          aria-label={menuAbierto ? 'Cerrar menú principal' : 'Abrir menú principal'}
           onClick={() => setMenuAbierto((abierto) => !abierto)}
         >
           <span></span>

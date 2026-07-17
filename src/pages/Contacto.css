@@ -476,6 +476,36 @@
   }
 }
 
+@media (max-width: 380px) {
+  .contact-eye {
+    display: none;
+  }
+
+  .contact-page {
+    width: min(100% - 20px, 1080px);
+    padding-top: 46px;
+    padding-bottom: max(64px, env(safe-area-inset-bottom));
+    gap: 46px;
+  }
+
+  .contact-page .contact-section {
+    padding: 28px 17px 17px;
+  }
+
+  .contact-page .contact-copy h1 {
+    font-size: clamp(2.25rem, 12vw, 2.8rem);
+  }
+
+  .contact-email-card {
+    padding: 18px 15px;
+  }
+
+  .contact-page .contact-network-card {
+    min-height: 205px;
+    padding: 21px;
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .contact-email-card > button:hover,
   .contact-page .contact-network-card:hover {

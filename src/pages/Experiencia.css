@@ -735,6 +735,46 @@
   }
 }
 
+@media (max-width: 360px) {
+  .experience-page {
+    padding-top: 52px;
+    padding-bottom: max(64px, env(safe-area-inset-bottom));
+  }
+
+  .experience-hero,
+  .experience-journal,
+  .experience-closing {
+    width: min(100% - 20px, 1180px);
+  }
+
+  .experience-hero h1 {
+    font-size: clamp(2.7rem, 14vw, 3.25rem);
+  }
+
+  .experience-hero__index {
+    padding-inline: 18px;
+  }
+
+  .experience-rail {
+    padding-left: 22px;
+  }
+
+  .experience-story__marker {
+    left: -22px;
+  }
+
+  .experience-story__visual figcaption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .experience-story__visual figcaption span:last-child {
+    max-width: 100%;
+    text-align: left;
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .experience-story:hover .experience-story__visual img {
     filter: saturate(0.84) contrast(1.04);

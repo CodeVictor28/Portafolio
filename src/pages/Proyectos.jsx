@@ -4,17 +4,122 @@ import './Proyectos.css'
 
 const USUARIO_GITHUB = perfil.githubUsuario
 const API_PROYECTOS = `https://api.github.com/users/${encodeURIComponent(USUARIO_GITHUB)}/repos?type=owner&sort=updated&direction=desc&per_page=100`
-const CLAVE_CACHE = `github-projects-${USUARIO_GITHUB}`
+const CLAVE_CACHE = `github-projects-v2-${USUARIO_GITHUB}`
 const DURACION_CACHE = 15 * 60 * 1000
+const MAX_REPOSITORIOS_CON_DESGLOSE = 24
+const TAMANO_LOTE_LENGUAJES = 6
 
 const COLORES_LENGUAJES = {
-  JavaScript: '#eeeeeb',
-  TypeScript: '#d5d5d1',
-  HTML: '#bbbbb7',
-  CSS: '#a2a29e',
-  Python: '#898986',
-  Java: '#70706e',
-  PHP: '#585856',
+  JavaScript: '#f1e05a',
+  TypeScript: '#3178c6',
+  HTML: '#e34c26',
+  CSS: '#8b5cf6',
+  Python: '#3572a5',
+  Java: '#b07219',
+  PHP: '#777bb4',
+  Vue: '#41b883',
+  Shell: '#89e051',
+  Astro: '#ff5d01',
+  Otros: '#8d8d89',
+}
+
+const TECNOLOGIAS_POR_REPOSITORIO = {
+  portafolio: [
+    'React',
+    'JavaScript',
+    'CSS',
+    'Vite',
+    'Motion',
+    'GSAP',
+    'OGL',
+    'GitHub REST API',
+  ],
+}
+
+function obtenerTecnologiasProyecto(proyecto) {
+  const personalizadas =
+    TECNOLOGIAS_POR_REPOSITORIO[proyecto.name.toLowerCase()] ?? []
+  const temas = proyecto.topics ?? []
+  const lenguajes = (proyecto.lenguajes ?? []).map(
+    (lenguaje) => lenguaje.nombre,
+  )
+
+  return [...new Set([...personalizadas, ...temas, ...lenguajes])].slice(0, 8)
+}
+
+function crearDesgloseLenguajes(lenguajes, lenguajePrincipal) {
+  const entradas = Object.entries(lenguajes ?? {})
+    .filter(([, bytes]) => Number.isFinite(bytes) && bytes > 0)
+    .sort(([, bytesA], [, bytesB]) => bytesB - bytesA)
+
+  if (entradas.length === 0) {
+    return lenguajePrincipal
+      ? [{ nombre: lenguajePrincipal, porcentaje: 100 }]
+      : []
+  }
+
+  const total = entradas.reduce((acumulado, [, bytes]) => acumulado + bytes, 0)
+  const principales = entradas.slice(0, 4)
+  const bytesOtros = entradas
+    .slice(4)
+    .reduce((acumulado, [, bytes]) => acumulado + bytes, 0)
+
+  if (bytesOtros > 0) principales.push(['Otros', bytesOtros])
+
+  return principales.map(([nombre, bytes]) => ({
+    nombre,
+    porcentaje: Number(((bytes / total) * 100).toFixed(1)),
+  }))
+}
+
+async function obtenerLenguajesProyecto(proyecto, signal) {
+  const fallback = crearDesgloseLenguajes({}, proyecto.language)
+
+  if (!proyecto.languages_url) return { ...proyecto, lenguajes: fallback }
+
+  try {
+    const respuesta = await fetch(proyecto.languages_url, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      signal,
+    })
+
+    if (!respuesta.ok) return { ...proyecto, lenguajes: fallback }
+
+    const lenguajes = await respuesta.json()
+
+    return {
+      ...proyecto,
+      lenguajes: crearDesgloseLenguajes(lenguajes, proyecto.language),
+    }
+  } catch (errorSolicitud) {
+    if (errorSolicitud.name === 'AbortError') throw errorSolicitud
+    return { ...proyecto, lenguajes: fallback }
+  }
+}
+
+async function enriquecerProyectos(proyectos, signal) {
+  const enriquecidos = []
+  const consultables = proyectos.slice(0, MAX_REPOSITORIOS_CON_DESGLOSE)
+
+  for (let indice = 0; indice < consultables.length; indice += TAMANO_LOTE_LENGUAJES) {
+    const lote = consultables.slice(indice, indice + TAMANO_LOTE_LENGUAJES)
+    const resultados = await Promise.all(
+      lote.map((proyecto) => obtenerLenguajesProyecto(proyecto, signal)),
+    )
+    enriquecidos.push(...resultados)
+  }
+
+  const restantes = proyectos
+    .slice(MAX_REPOSITORIOS_CON_DESGLOSE)
+    .map((proyecto) => ({
+      ...proyecto,
+      lenguajes: crearDesgloseLenguajes({}, proyecto.language),
+    }))
+
+  return [...enriquecidos, ...restantes]
 }
 
 function leerCache() {
@@ -82,6 +187,7 @@ function Proyectos() {
       const respuesta = await fetch(API_PROYECTOS, {
         headers: {
           Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
         },
         signal,
       })
@@ -102,7 +208,10 @@ function Proyectos() {
         throw new Error('GitHub devolvió una respuesta inesperada.')
       }
 
-      const proyectosPreparados = prepararProyectos(datos)
+      const proyectosPreparados = await enriquecerProyectos(
+        prepararProyectos(datos),
+        signal,
+      )
       setProyectos(proyectosPreparados)
       guardarCache(proyectosPreparados)
       setEstado(proyectosPreparados.length > 0 ? 'listo' : 'vacio')
@@ -147,7 +256,7 @@ function Proyectos() {
   return (
     <main className="projects-page">
       <section className="projects-hero" aria-labelledby="titulo-proyectos">
-        <div>
+        <div className="projects-hero-copy">
           <p className="projects-kicker">
             <span className="projects-live-dot" aria-hidden="true" />
             Datos en vivo desde GitHub
@@ -157,14 +266,17 @@ function Proyectos() {
           </h1>
         </div>
 
-        <div className="projects-api-card">
-          <span>GitHub REST API</span>
+        <aside className="projects-api-card" aria-label="Conexión con GitHub">
+          <div className="projects-api-label">
+            <span aria-hidden="true" />
+            GitHub REST API
+          </div>
           <strong>@{USUARIO_GITHUB}</strong>
           <p>
             Los repositorios se actualizan automáticamente conforme publico
             nuevos proyectos.
           </p>
-        </div>
+        </aside>
       </section>
 
       {proyectos.length > 0 && (
@@ -276,11 +388,65 @@ function Proyectos() {
                 </p>
               </div>
 
-              {proyecto.topics?.length > 0 && (
-                <div className="project-topics" aria-label="Temas">
-                  {proyecto.topics.slice(0, 3).map((tema) => (
-                    <span key={tema}>{tema}</span>
-                  ))}
+              <div
+                className="project-technologies"
+                aria-label={`Tecnologías usadas en ${proyecto.name}`}
+              >
+                <div className="project-technologies-heading">
+                  <span>Tecnologías usadas</span>
+                  <small>Stack</small>
+                </div>
+                <div className="project-technologies-grid">
+                  {obtenerTecnologiasProyecto(proyecto).map(
+                    (tecnologia, technologyIndex) => (
+                      <span key={tecnologia}>
+                        <i aria-hidden="true">
+                          {String(technologyIndex + 1).padStart(2, '0')}
+                        </i>
+                        {tecnologia}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              {proyecto.lenguajes?.length > 0 && (
+                <div
+                  className="project-languages"
+                  aria-label={`Distribución del código de ${proyecto.name}`}
+                >
+                  <div className="project-languages-heading">
+                    <span>Tecnologías detectadas</span>
+                    <small>GitHub API</small>
+                  </div>
+
+                  <div className="project-language-list">
+                    {proyecto.lenguajes.map((lenguaje, languageIndex) => (
+                      <div className="project-language" key={lenguaje.nombre}>
+                        <div className="project-language-copy">
+                          <span>{lenguaje.nombre}</span>
+                          <strong>{lenguaje.porcentaje.toFixed(1)}%</strong>
+                        </div>
+                        <div
+                          className="project-language-track"
+                          role="progressbar"
+                          aria-label={`${lenguaje.nombre}: ${lenguaje.porcentaje.toFixed(1)}%`}
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          aria-valuenow={Math.round(lenguaje.porcentaje)}
+                        >
+                          <span
+                            style={{
+                              '--bar-color':
+                                COLORES_LENGUAJES[lenguaje.nombre] ?? '#c9c9c5',
+                              '--bar-percentage': `${lenguaje.porcentaje}%`,
+                              '--bar-delay': `${languageIndex * 90}ms`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -335,6 +501,7 @@ function Proyectos() {
           </button>
         </section>
       )}
+
     </main>
   )
 }

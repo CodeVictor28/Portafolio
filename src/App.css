@@ -1,6 +1,13 @@
 .app {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 100vh;
   overflow-x: clip;
+}
+
+body.menu-open {
+  overflow: hidden;
 }
 
 .app--home {
@@ -26,7 +33,14 @@
 }
 
 .page-main {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(100vh - 180px);
+}
+
+.page-main > * {
+  max-width: 100%;
 }
 
 .route-loading {
@@ -66,6 +80,8 @@
   position: sticky;
   z-index: 50;
   top: 0;
+  padding-right: env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
   padding-top: 16px;
   border: 0;
   background: transparent;
@@ -105,11 +121,15 @@
 }
 
 .brand {
+  min-width: 0;
   color: var(--text);
   font-size: 1.12rem;
   font-weight: 520;
   letter-spacing: -0.025em;
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brand span {
@@ -1417,6 +1437,11 @@
     color: var(--text);
     background: transparent;
     cursor: pointer;
+    flex: none;
+  }
+
+  .brand {
+    max-width: calc(100% - 58px);
   }
 
   .menu-toggle > span:not(.visually-hidden) {
@@ -1438,6 +1463,7 @@
     max-height: calc(100dvh - 68px);
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
   .main-nav.is-open {
@@ -1456,6 +1482,7 @@
     box-shadow: 0 18px 48px rgb(0 0 0 / 22%);
     backdrop-filter: blur(18px) saturate(115%);
     -webkit-backdrop-filter: blur(18px) saturate(115%);
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .hero-section {
@@ -1744,6 +1771,34 @@
   .main-nav.is-open {
     backdrop-filter: blur(10px) saturate(108%);
     -webkit-backdrop-filter: blur(10px) saturate(108%);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding-bottom: max(68px, env(safe-area-inset-bottom));
+  }
+
+  .hero-copy h1,
+  .hero-description,
+  .eyebrow {
+    max-width: 100%;
+  }
+
+  .hero-actions .specular-button {
+    min-height: 54px;
+  }
+
+  .social-dock {
+    margin-top: 40px;
+  }
+
+  .location-badge {
+    right: 0;
+  }
+
+  .site-footer {
+    padding-bottom: max(36px, env(safe-area-inset-bottom));
   }
 }
 
